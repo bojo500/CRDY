@@ -66,4 +66,12 @@ export class UsersService {
       statusCode: HttpStatus.OK,
     };
   }
+
+  async findOneByUsername(username: string): Promise<User> {
+    return this.repository.findOne(username);
+  }
+
+  async findOneByEmail(email: string): Promise<User> {
+    return this.repository.findOne(email);
+  }
 }
