@@ -1,26 +1,61 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBlogOneDto } from './dto/create-blog-one.dto';
-import { UpdateBlogOneDto } from './dto/update-blog-one.dto';
+import { HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { CreateBlogOneDto, UpdateBlogOneDto } from "./dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { BlogOne } from "./entities/blog-one.entity";
 
 @Injectable()
 export class BlogOneService {
-  create(createBlogOneDto: CreateBlogOneDto) {
-    return 'This action adds a new blogOne';
+
+  constructor(@InjectRepository(BlogOne) private repository: Repository<BlogOne>) {
   }
 
+  async create(createBlogOneDto: CreateBlogOneDto) {
+    try {
+      await this.repository.save(createBlogOneDto);
+    } catch {
+      throw new InternalServerErrorException();
+    }
+    return {
+      message: "Created Successfully",
+      statusCode: HttpStatus.CREATED
+    };
+  }
+
+
   findAll() {
-    return `This action returns all blogOne`;
+    return this.repository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} blogOne`;
+    return this.repository.findOne(id);
   }
 
-  update(id: number, updateBlogOneDto: UpdateBlogOneDto) {
-    return `This action updates a #${id} blogOne`;
+  async update(id: number, updateBlogOneDto: UpdateBlogOneDto) {
+    try {
+      await this.repository.save({ ...updateBlogOneDto});
+    } catch {
+      throw new InternalServerErrorException();
+    }
+    return {
+      message: "Updated Successfully",
+      statusCode: HttpStatus.OK
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} blogOne`;
+  async remove(id: number) {
+    let item = await this.findOne(id);
+    if (!item) {
+      throw new NotFoundException();
+    }
+    try {
+      await this.repository.delete(item.id);
+    } catch {
+      throw new InternalServerErrorException();
+    }
+    return {
+      message: "Deleted Successfully",
+      statusCode: HttpStatus.OK
+    };
   }
 }
