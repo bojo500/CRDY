@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from "@nestjs/common";
 import { BlogOneService } from './blog-one.service';
 import { CreateBlogOneDto, UpdateBlogOneDto } from "./dto";
+import { LocalAuthGuard } from "../auth/guards/local-auth.guard";
 
 @Controller('blog-one')
+@UseGuards(LocalAuthGuard)
 export class BlogOneController {
   constructor(private readonly blogOneService: BlogOneService) {}
 
