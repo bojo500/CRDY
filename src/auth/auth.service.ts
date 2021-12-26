@@ -4,14 +4,14 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  InternalServerErrorException
+  InternalServerErrorException, UnauthorizedException
 } from "@nestjs/common";
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from "bcrypt";
 import { UsersService } from "../users/users.service";
 import { User } from "../users/entities/user.entity";
-import { RegisterDto } from "../users/dto/register.dto";
-import { TokenPayloadInterface } from "./strategys/jwt.strategy";
+import { RegisterDto } from "../users/dto";
+import { TokenPayloadInterface } from "./interfaces";
 
 @Injectable()export class AuthService {
 
@@ -54,7 +54,7 @@ import { TokenPayloadInterface } from "./strategys/jwt.strategy";
     }
     user.password = await bcrypt.hash(user.password, 10);
     try {
-      await this.usersService.create(user);
+      await this.usersService.createUser(user);
 
     } catch {
       throw new InternalServerErrorException();
@@ -70,5 +70,15 @@ import { TokenPayloadInterface } from "./strategys/jwt.strategy";
       message,
       statusCode: HttpStatus.BAD_REQUEST,
     });
+  }
+
+  async checkAuth(token: string): Promise<TokenPayloadInterface> {
+    let verifyObject: TokenPayloadInterface;
+    try {
+      verifyObject = await this.jwtService.verify(token);
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
+    return verifyObject;
   }
 }

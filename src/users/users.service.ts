@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException
 } from "@nestjs/common";
-import { CreateUserDto, UpdateUserDto } from "./dto";
+import { CreateUserDto, RegisterDto, UpdateUserDto } from "./dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
@@ -65,6 +65,14 @@ export class UsersService {
       message: 'User Deleted Successfully',
       statusCode: HttpStatus.OK,
     };
+  }
+
+  async createUser(createUserDto: RegisterDto): Promise<User> {
+    const user = await this.repository.save(createUserDto);
+    if (!user) {
+      throw new BadRequestException();
+    }
+    return user;
   }
 
   async findOneByUsername(username: string): Promise<User> {
