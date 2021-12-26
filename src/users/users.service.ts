@@ -32,11 +32,11 @@ export class UsersService {
   }
 
   findAll() {
-    return this.repository.find();
+    return this.repository.find({ relations: ["blogOnes"] });
   }
 
   findOne(id: string) {
-    return this.repository.findOne(id);
+    return this.repository.findOne(id, { relations: ["blogOnes"] });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

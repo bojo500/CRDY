@@ -24,11 +24,11 @@ export class BlogOneService {
 
 
   findAll() {
-    return this.repository.find();
+    return this.repository.find({ relations: ["user"] });
   }
 
   findOne(id: number) {
-    return this.repository.findOne(id);
+    return this.repository.findOne(id, { relations: ["user"] });
   }
 
   async update(id: number, updateBlogOneDto: UpdateBlogOneDto) {
