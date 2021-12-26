@@ -1,4 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException
+} from "@nestjs/common";
 import { CreateUserDto, UpdateUserDto } from "./dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
@@ -9,23 +15,55 @@ export class UsersService {
   constructor(@InjectRepository(User) private repository: Repository<User>) {
   }
 
-  create(createUserDto: CreateUserDto) {
-    return this.repository.create(createUserDto);
+  async create(createUserDto: CreateUserDto): Promise<any> {
+    const user = await this.findOne(CreateUserDto.name);
+    if (user) {
+      throw new BadRequestException('The User is Already exists ');
+    }
+    try {
+      await this.repository.save(createUserDto);
+    } catch {
+      throw new InternalServerErrorException();
+    }
+    return {
+      message: 'User Created Successfully',
+      statusCode: HttpStatus.CREATED,
+    };
   }
 
   findAll() {
     return this.repository.find();
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return this.repository.findOne(id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.repository.update(id, updateUserDto);
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      await this.repository.save({ ...updateUserDto, id });
+    } catch {
+      throw new InternalServerErrorException();
+    }
+    return {
+      message: 'User Updated Successfully',
+      statusCode: HttpStatus.OK,
+    };
   }
 
-  remove(id: number) {
-    return this.repository.delete(id);
+  async remove(id: string) {
+    let item = await this.findOne(id);
+    if (!item) {
+      throw new NotFoundException();
+    }
+    try {
+      await this.repository.delete(item.id);
+    } catch {
+      throw new InternalServerErrorException();
+    }
+    return {
+      message: 'User Deleted Successfully',
+      statusCode: HttpStatus.OK,
+    };
   }
 }
