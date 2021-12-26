@@ -15,13 +15,13 @@ export class UsersService {
   constructor(@InjectRepository(User) private repository: Repository<User>) {
   }
 
-  async create(createUserDto: CreateUserDto): Promise<any> {
-    const user = await this.findOne(CreateUserDto.name);
+  async create(CreateUserDto: CreateUserDto): Promise<any> {
+    const user = await this.findOne(CreateUserDto.username);
     if (user) {
       throw new BadRequestException('The User is Already exists ');
     }
     try {
-      await this.repository.save(createUserDto);
+      await this.repository.save(CreateUserDto);
     } catch {
       throw new InternalServerErrorException();
     }
