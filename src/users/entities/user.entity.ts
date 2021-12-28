@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { BlogOne } from "../../blog-one/entities/blog-one.entity";
 import { Role } from "../enum";
+import { ApiProperty } from "@nestjs/swagger";
 
 @Entity()
 export class User {
@@ -13,6 +14,7 @@ export class User {
   @Column()
   password: string;
 
+  @ApiProperty({ enum: ['Admin', 'User']})
   roles: Role[];
 
   @OneToMany(() => BlogOne, blogOne => blogOne.user)

@@ -16,11 +16,13 @@ export class UsersController {
   }
 
   @Get()
+  @Roles(Role.User)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
+  @Roles(Role.User)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
